@@ -1,11 +1,17 @@
 package com.ubs.opsit.interviews;
 
+import static com.ubs.opsit.interviews.support.BehaviouralTestEmbedder.aBehaviouralTestRunner;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.concurrent.TimeUnit;
+
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.junit.Test;
 
-import static com.ubs.opsit.interviews.support.BehaviouralTestEmbedder.aBehaviouralTestRunner;
-import static org.assertj.core.api.Assertions.assertThat;
+import com.ubs.opsit.interviews.impl.BerlinClockTimeConverter;
+import com.ubs.opsit.interviews.model.BerlinUhrClock;
+import com.ubs.opsit.interviews.model.Clock;
 
 /**
  * Acceptance test class that uses the JBehave (Gerkin) syntax for writing stories.  You should not need to
@@ -15,6 +21,14 @@ public class BerlinClockFixture {
 
     private TimeConverter berlinClock;
     private String theTime;
+    
+    private void reset() {
+    	Clock clock = new BerlinUhrClock();
+    	TimeConverter hoursConverter = new BerlinClockTimeConverter(clock, TimeUnit.HOURS, null);
+    	TimeConverter minutesConverter = new BerlinClockTimeConverter(clock, TimeUnit.MINUTES, hoursConverter);
+    	TimeConverter secondsConverter = new BerlinClockTimeConverter(clock, TimeUnit.SECONDS, minutesConverter);
+    	this.berlinClock = secondsConverter;
+    }
 
     @Test
     public void berlinClockAcceptanceTests() throws Exception {
@@ -26,6 +40,7 @@ public class BerlinClockFixture {
 
     @When("the time is $time")
     public void whenTheTimeIs(String time) {
+    	reset();
         theTime = time;
     }
 
